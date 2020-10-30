@@ -12,7 +12,7 @@ runtime complexity O(n^2)
 removes non alphanumeric chars from each token if they arent already removed
 '''
 def stripUnderscores(text: list):
-    return [i.strip('_][{}^!@#$%&*()</\|-=+>? `~/*-') for i in text]
+    return [i.strip('_][{}^!@#$%&*()</\\|-=+>? `~/*-') for i in text]
 
 ''' 
 runtime complexity is O(n^3)*O(n*log(n)) because a list comprehension to remove all characters not 
