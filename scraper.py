@@ -14,7 +14,7 @@ already_visted = set()
     
 def scraper(url, resp):
     print("*                                                                  *")
-
+    
     ## the scraper is being called and raw_response.content prints the resp of the url
     #print(resp.raw_response.content)
     
@@ -34,29 +34,31 @@ def extract_next_links(url, resp):
     # Implementation requred.
     #
     extracted_links = []
-
     #links = list()
     #print("Type of response ", type(resp.raw_response.content))
     if resp.raw_response:
-        lines = resp.raw_response.content.decode("utf-8")
+        lines = resp.raw_response.content.decode("utf-8","ignore")
         lines = lines.split('\n')
         #print("Lines type is",type(lines[0]))
         for line in lines:
             urls = re.findall('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', line)
             extracted_links += urls
 
-        for l in extracted_links:
-            print(l)
+        
         #resp.raw_response.content
 
         #if url not in already_visted:
             # return extracted_links
         
         global already_visted
+        extracted_links = set(extracted_links)
         for i in already_visted:
             if i in extracted_links:
                 extracted_links.remove(i)
+        for l in extracted_links:
+            print(l)
         already_visted.union(set(extracted_links))
+        extracted_links = list(extracted_links)
         
         return extracted_links
 
