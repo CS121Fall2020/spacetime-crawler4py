@@ -1,4 +1,4 @@
-#owner : Jacob Martinez 
+#owner : CS121 gang yeeeeeet
 #authorized use is for cs121 soley and nothing else :-)
 # testing to see if this works?
 
@@ -23,18 +23,39 @@ After, is sent through another function that iterates through each token in the 
 non alphanumeric characters that got through the regular expression
 
 '''
-def tokenizer(fileName: str) -> list:
-    try:
-        t = []
-        with open(fileName, encoding="utf-8") as open_file:
-            for line in open_file: #O(n)
-                x = re.findall(r"[a-zA-z0-9]+", line) #O(n*log(n))
-                x = stripUnderscores(x) #O(n^2)
-                t += x #O(1)
 
-        return t
-    except:
-        print("Error in Tokenizer! File does not exist!")
+      
+
+#returns updated l
+# def getLinks(copy_line:str,links:list) -> list:
+#     if (copy_line == ''):
+#         return links
+#     while("\'http" in copy_line or "\"http" in copy_line):
+#         if("\'http" in copy_line):
+#             link_index = copy_line.find("\'http")
+#         elif("\"http" in copy_line):
+#             link_index = copy_line.find("\"http")
+#         sub_while = link_index
+#         while (link_index < len(copy_line)):
+#             if copy_line[i] == "\"" or copy_line[i] == "\'":
+#                     links.append(line[link_index + 1 : i])
+#                     copy_line = copy_line[i::]
+
+# <![CDATA[\n!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=\'https://weatherwidget.io/js/widget.min.js\';fjs.parentNode.insertBefore(js,fjs);}}(document,\'script\',\'weatherwidget-io-js\');\n// ]]></script>\n END/weather widget -->
+def tokenizer(fileName: str) -> list:
+    links = list()
+    lines = fileName.split('\n')
+    for line in lines:
+        print(links)
+        urls = re.findall('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', line)
+        links += urls
+
+            #send to another function to get link
+            
+    # for l in links:
+    #     print(l)
+    # return links
+   
 
 '''
 runtime complexity is O(n^2) because the dictionary makes all keys lowercase in order to 
@@ -61,16 +82,10 @@ def printFrequencies(Frequencies: defaultdict):
     for t in sorted_dict: # O(n)
         print(t[0],"-> ",t[1]) # O(1) + O(1) + O(1) + O(1) = O(1)
 
+
+
 if __name__ == '__main__':
-    try:
-        if len(sys.argv) != 2:
-            raise OSError("You have not input the proper amount of files.")
-        tokens = tokenizer(sys.argv[1])
-        wordDictionary = computeWordFrequencies(tokens)
-        printFrequencies(wordDictionary)
-
-    except:
-        print("An error has occurred... Please try again with a different file")
-
+    string2 = '<p>Contents :</p><a href="https://uci.w3resource.com">Python Examples</a><a href="http://github.com">Even More Examples</a></script>\n    <script src="bin/js/btt.js" type="text/javascript">\n    </script>\n    <script src="bin/js/menu_hover.js" type="text/javascript">\n    </script>\n    <!-- Accessibilty - START -->\n    <script type="text/javascript">\n    var _userway_config = {\n        /* uncomment the following line to override default position*/\n        /* position: \'2\', */\n        /* uncomment the following line to override default size (values: small, large)*/\n        /* size: \'small\', */\n        /* uncomment the following line to override default language (e.g., fr, de, es, he, nl, etc.)*/\n        /* language: \'en-US\', */\n        /* uncomment the following line to override color set via widget (e.g., #053f67)*/\n        /* color: \'#0064a4\', */\n        /* uncomment the following line to override type set via widget(1=person, 2=chair, 3=eye)*/\n        /* type: \'1\', */\n        /* uncomment the following line to override support on mobile devices*/\n        /* mobile: true, */\n        account: \'GTYOD4aROB\'\n    };\n    </script>\n    <script src="https://cdn.userway.org/widget.js" type="text/javascript">\n    </script>\n    <!-- Accessibilty - END -->\n</body>\n\n</html>'
+    tokens = tokenizer(string2)
 
 

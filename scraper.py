@@ -3,13 +3,62 @@ from urllib.parse import urlparse
 from PartA import *
 from PartB import *
 
+#global var holds urls we've been too
+already_visted = set()
+
+#scraper finds net urls to go to from current url
+#things to check:
+    #that we arent adding a link we started with
+    #change is_valid to check the robot text
+    #remove urls that are banned
+    
 def scraper(url, resp):
+    print("*                                                                  *")
+
+    ## the scraper is being called and raw_response.content prints the resp of the url
+    #print(resp.raw_response.content)
+    
+    #adds url to a list of urls that have been visited
+    global already_visted
+    already_visted.add(url)
+    
     links = extract_next_links(url, resp)
+    if not links:
+        return []
+    #returning the valid links
     return [link for link in links if is_valid(link)]
 
+#scrape the entire page for any other urls. 
+#needs to not grab link that is the parameter 
 def extract_next_links(url, resp):
     # Implementation requred.
-    return list()
+    #
+    extracted_links = []
+
+    #links = list()
+    #print("Type of response ", type(resp.raw_response.content))
+    if resp.raw_response:
+        lines = resp.raw_response.content.decode("utf-8")
+        lines = lines.split('\n')
+        #print("Lines type is",type(lines[0]))
+        for line in lines:
+            urls = re.findall('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', line)
+            extracted_links += urls
+
+        for l in extracted_links:
+            print(l)
+        #resp.raw_response.content
+
+        #if url not in already_visted:
+            # return extracted_links
+        
+        global already_visted
+        for i in already_visted:
+            if i in extracted_links:
+                extracted_links.remove(i)
+        already_visted.union(set(extracted_links))
+        
+        return extracted_links
 
 def is_valid(url):
     try:
