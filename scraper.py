@@ -1,5 +1,7 @@
 import re
 from urllib.parse import urlparse
+from bs4 import BeautifulSoup
+# import bs4
 from PartA import *
 from PartB import *
 
@@ -16,7 +18,7 @@ def scraper(url, resp):
     print("*                                                                  *")
     
     ## the scraper is being called and raw_response.content prints the resp of the url
-    #print(resp.raw_response.content)
+    print(resp.raw_response.content)
     
     #adds url to a list of urls that have been visited
     global already_visted
@@ -34,31 +36,70 @@ def extract_next_links(url, resp):
     # Implementation requred.
     #
     extracted_links = []
-    #links = list()
-    #print("Type of response ", type(resp.raw_response.content))
-    if resp.raw_response:
-        lines = resp.raw_response.content.decode("utf-8","ignore")
-        lines = lines.split('\n')
-        #print("Lines type is",type(lines[0]))
-        for line in lines:
-            urls = re.findall('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', line)
-            extracted_links += urls
+ 
+    # ----------
+    data = resp.raw_response.content
+    soup = BeautifulSoup(data, 'lxml')
+    
+    # Extracting all the <a> tags into a list.
+    tags = soup.find_all('a')
+    
+    # Extracting URLs from the attribute href in the <a> tags.
+    for tag in tags:
+        print(tag.get('href'))
+    # ----------
 
-        
-        #resp.raw_response.content
 
-        #if url not in already_visted:
-            # return extracted_links
+
+
+
+
+
+
+
+
+
+    # if resp.raw_response:
+    #     resp = requests.get(url)
+    # soup = BeautifulSoup(resp.text, 'lxml')
+
+    # urls = []
+    # for h in soup.find_all('h3'):
+    # a = h.find('a')
+    # urls.append(a.attrs['href'])
+
+
+
+
+
+
+
+
+
+        # lines = resp.raw_response.content.decode("utf-8","ignore")
+        # lines = lines.split('\n')
+        # #print("Lines type is",type(lines[0]))
+        # for line in lines:
+        #     urls = re.findall('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', line)
+        #     #urls = re.findall('http[s]?:\/\/(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+\'', line)
+            
+        #     #if(urls[0]):
+        #         #print("*********************:  " ,urls[0][:-1])
+        #     extracted_links += urls
         
-        global already_visted
-        extracted_links = set(extracted_links)
-        for i in already_visted:
-            if i in extracted_links:
-                extracted_links.remove(i)
-        for l in extracted_links:
-            print(l)
-        already_visted.union(set(extracted_links))
-        extracted_links = list(extracted_links)
+        # #resp.raw_response.content
+        # #if url not in already_visted:
+        #     # return extracted_links
+        # #</script>
+        # global already_visted
+        # extracted_links = set(extracted_links)
+        # for i in already_visted:
+        #     if i in extracted_links:
+        #         extracted_links.remove(i)
+        # for l in extracted_links:
+        #     print("****", l)
+        # already_visted.union(set(extracted_links))
+        # extracted_links = list(extracted_links)
         
         return extracted_links
 
