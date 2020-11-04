@@ -35,9 +35,9 @@ runtime complexity O(n^2)
 removes non alphanumeric chars from each token if they arent already removed
 '''
 def stripUnderscores(text: list):
-    return [i.strip('_][{}^!@#$%&*()</\\|=+>?`~/*') for i in text]
+    return [i.strip('_][{}^!@#$.%&*()</\\|=+>?`~/*') for i in text]
 
- 
+
 '''
 a file is opened and each line is searched for all possible alphanumeric matches
 After, is sent through another function that iterates through each token in the line removing 
@@ -111,14 +111,14 @@ def printFifty(Frequencies:defaultdict):
     file = open("outputA.txt","w")
     sorted_dict = sorted(Frequencies.items(),key = lambda x : x[1], reverse = True)
     for t in sorted_dict: # O(n)
-        s  = str(t[0]) + "-> " + str(t[1]) + '\n'
+        s  = str(t[0]) + " -> " + str(t[1]) + '\n'
         file.write(s) # O(1) + O(1) + O(1) + O(1) = O(1)
     file.close()
 
 if __name__ == '__main__':
     # string2 = '<p>Contents :</p><a href="https://uci.w3resource.com">Python Examples</a><a href="http://github.com">Even More Examples</a></script>\n    <script src="bin/js/btt.js" type="text/javascript">\n    </script>\n    <script src="bin/js/menu_hover.js" type="text/javascript">\n    </script>\n    <!-- Accessibilty - START -->\n    <script type="text/javascript">\n    var _userway_config = {\n        /* uncomment the following line to override default position*/\n        /* position: \'2\', */\n        /* uncomment the following line to override default size (values: small, large)*/\n        /* size: \'small\', */\n        /* uncomment the following line to override default language (e.g., fr, de, es, he, nl, etc.)*/\n        /* language: \'en-US\', */\n        /* uncomment the following line to override color set via widget (e.g., #053f67)*/\n        /* color: \'#0064a4\', */\n        /* uncomment the following line to override type set via widget(1=person, 2=chair, 3=eye)*/\n        /* type: \'1\', */\n        /* uncomment the following line to override support on mobile devices*/\n        /* mobile: true, */\n        account: \'GTYOD4aROB\'\n    };\n    </script>\n    <script src="https://cdn.userway.org/widget.js" type="text/javascript">\n    </script>\n    <!-- Accessibilty - END -->\n</body>\n\n</html>'
     # tokens = tokenizer(string2)
-    tokens = tokenizer("chunky.txt")
+    tokens = tokenizer("chonker.txt")
     dic = computeWordFrequencies(tokens)
     removeStopWords(dic)
     newFrequencies = topFifty(dic)

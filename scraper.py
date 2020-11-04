@@ -1,3 +1,11 @@
+'''
+[X]Honor the politeness delay for each site
+[]Crawl all pages with high textual information content
+[]Detect and avoid infinite traps
+[]Detect and avoid sets of similar pages with no information
+[]Detect and avoid dead URLs that return a 200 status but no data (click here to see what the different HTTP status codes mean (Links to an external site.))
+[]Detect and avoid crawling very large files, especially if they have low information value
+'''
 import re
 from urllib.parse import urlparse
 from bs4 import BeautifulSoup
@@ -10,12 +18,11 @@ from PartB import *
 #global var holds urls we've been too
 already_visted = set()
 
-#scraper finds net urls to go to from current url
-#things to check:
-    #that we arent adding a link we started with
-    #change is_valid to check the robot text
-    #remove urls that are banned
 
+'''
+checks to make sure we are only adding domains to extracted links
+if they are relvant to any of these sub domains 
+'''
 def checkDomain(extracted_links):
     valid_links = []
     for link in extracted_links:
@@ -35,16 +42,41 @@ def checkDomain(extracted_links):
                 valid_links.append(link)
     # for link in range 
     return valid_links
-    #*.ics.uci.edu/*
-    #*.cs.uci.edu/*
-    #*.informatics.uci.edu/*
-    #*.stat.uci.edu/*
-    #today.uci.edu/department/information_computer_sciences/*
     
-    
+
+def url_texts(url,resp):
+    stringy = ""
+    data = resp.raw_response.content
+    soup = BeautifulSoup(data, 'lxml')
+    stringy = soup.find('p').text
+    print("@@@@@@@@@I am stringy" , stringy)
+
+    return stringy
+
+'''
+F(x) call(s):
+    - extract_next_link
+    - checkSubDomain
+    - is_valid
+we created a global set for all sites added to the extracted links
+    - holds all unique websites that fit subdomain requirement
+    - is used to cross compare with new extracted links to prevent pushing the same page info
+
+Purpose: to get all info from a url possible
+'''
 def scraper(url, resp):    
     #adds url to a list of urls that have been visited
     #global already_visted
+    print('we are in scraper')
+
+    #something regarding valid HTTP response code
+    #its contents
+    #its sizeof()
+    #see how many pages it has
+    #get word count for each page
+    # put all words together
+    # extract next links
+    
     already_visted.add(url)
     
     links = extract_next_links(url, resp)
@@ -57,68 +89,49 @@ def scraper(url, resp):
 
     return [link for link in valid_links if is_valid(link)]
 
-#scrape the entire page for any other urls. 
-#needs to not grab link that is the parameter 
+
+'''
+gets all of the links in the url and then gets rid of the links that have already 
+been visited in extracted_links. Then updates the visited links to have the newly
+extracted links.
+
+Purpose: to get and return a list of the new links in the current url
+'''
 def extract_next_links(url, resp):
     # Implementation requred.
-    #
     extracted_links = []
-    # return extracted_links
- 
     # ----------
     try:
         data = resp.raw_response.content
         soup = BeautifulSoup(data, 'lxml')
-        
         # Extracting all the <a> tags into a list.
         tags = soup.find_all('a')
         # print(tags)
-        
         # Extracting URLs from the attribute href in the <a> tags.
         for tag in tags:
             # print('in for') 
             extracted_links.append(tag.get('href'))
             # print(tag.get('href'))
+        extracted_links = set(extracted_links)
+        for i in already_visted:
+            if i in extracted_links:
+                extracted_links.remove(i)
+        already_visted.union(set(extracted_links))
+        extracted_links = list(extracted_links)
+    
     except:
         print("It didn't work")
     # ----------
-
-    # if resp.raw_response:
-    #     resp = requests.get(url)
-    # soup = BeautifulSoup(resp.text, 'lxml')
-
-    # urls = []
-    # for h in soup.find_all('h3'):
-    # a = h.find('a')
-    # urls.append(a.attrs['href'])
-
-
-        # lines = resp.raw_response.content.decode("utf-8","ignore")
-        # lines = lines.split('\n')
-        # #print("Lines type is",type(lines[0]))
-        # for line in lines:
-        #     urls = re.findall('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', line)
-        #     #urls = re.findall('http[s]?:\/\/(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+\'', line)
-            
-        #     #if(urls[0]):
-        #         #print("*********************:  " ,urls[0][:-1])
-        #     extracted_links += urls
-        
-        # #resp.raw_response.content
-        # #if url not in already_visted:
-        #     # return extracted_links
-    already_visted
-    extracted_links = set(extracted_links)
-    for i in already_visted:
-        if i in extracted_links:
-            extracted_links.remove(i)
-    # for l in extracted_links:
-    #     print("****", l)
-    already_visted.union(set(extracted_links))
-    extracted_links = list(extracted_links)
         
     return extracted_links
 
+'''
+Purpose: checks to make sure the url is valid.
+    - valid sites are NOT special file types, such as: pdf,gif,png,mp4,etc.
+
+Proposals: REDACTED
+    
+'''
 def is_valid(url):
     try:
         parsed = urlparse(url)
