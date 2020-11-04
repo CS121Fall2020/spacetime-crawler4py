@@ -1,10 +1,12 @@
 import re
 from urllib.parse import urlparse
 from bs4 import BeautifulSoup
-# import bs4
 from PartA import *
 from PartB import *
 
+#def allTags(url):
+#tags_html = BeautifulSoup(html_url,"html.parser")
+#tags = [tag.name for tag in tags_html.find_all()]
 #global var holds urls we've been too
 already_visted = set()
 
@@ -13,22 +15,47 @@ already_visted = set()
     #that we arent adding a link we started with
     #change is_valid to check the robot text
     #remove urls that are banned
+
+def checkDomain(extracted_links):
+    valid_links = []
+    for link in extracted_links:
+        if link:
+            # if link[0:4] != 'http':
+            #     link = link[2:]
+            #     print("!!!!!!!!!!! I made it here", link)
+            if '.ics.uci.edu' in link:
+                valid_links.append(link)
+            elif '.cs.uci.edu' in link:
+                valid_links.append(link)
+            elif '.informatics.uci.edu' in link:
+                valid_links.append(link)
+            elif '.stat.uci.edu' in link:
+                valid_links.append(link)
+            elif 'today.uci.edu/department/information_computer_sciences' in link:
+                valid_links.append(link)
+    # for link in range 
+    return valid_links
+    #*.ics.uci.edu/*
+    #*.cs.uci.edu/*
+    #*.informatics.uci.edu/*
+    #*.stat.uci.edu/*
+    #today.uci.edu/department/information_computer_sciences/*
     
-def scraper(url, resp):
-    print("*                                                                  *")
     
-    ## the scraper is being called and raw_response.content prints the resp of the url
-    print(resp.raw_response.content)
-    
+def scraper(url, resp):    
     #adds url to a list of urls that have been visited
-    global already_visted
+    #global already_visted
     already_visted.add(url)
     
     links = extract_next_links(url, resp)
     if not links:
         return []
     #returning the valid links
-    return [link for link in links if is_valid(link)]
+    valid_links = checkDomain(links)
+    for l in valid_links:
+        print("^^^^^^^^", l)
+
+    return [link for link in valid_links if is_valid(link)]
 
 #scrape the entire page for any other urls. 
 #needs to not grab link that is the parameter 
@@ -36,28 +63,25 @@ def extract_next_links(url, resp):
     # Implementation requred.
     #
     extracted_links = []
+    # return extracted_links
  
     # ----------
-    data = resp.raw_response.content
-    soup = BeautifulSoup(data, 'lxml')
-    
-    # Extracting all the <a> tags into a list.
-    tags = soup.find_all('a')
-    
-    # Extracting URLs from the attribute href in the <a> tags.
-    for tag in tags:
-        print(tag.get('href'))
+    try:
+        data = resp.raw_response.content
+        soup = BeautifulSoup(data, 'lxml')
+        
+        # Extracting all the <a> tags into a list.
+        tags = soup.find_all('a')
+        # print(tags)
+        
+        # Extracting URLs from the attribute href in the <a> tags.
+        for tag in tags:
+            # print('in for') 
+            extracted_links.append(tag.get('href'))
+            # print(tag.get('href'))
+    except:
+        print("It didn't work")
     # ----------
-
-
-
-
-
-
-
-
-
-
 
     # if resp.raw_response:
     #     resp = requests.get(url)
@@ -67,13 +91,6 @@ def extract_next_links(url, resp):
     # for h in soup.find_all('h3'):
     # a = h.find('a')
     # urls.append(a.attrs['href'])
-
-
-
-
-
-
-
 
 
         # lines = resp.raw_response.content.decode("utf-8","ignore")
@@ -90,18 +107,17 @@ def extract_next_links(url, resp):
         # #resp.raw_response.content
         # #if url not in already_visted:
         #     # return extracted_links
-        # #</script>
-        # global already_visted
-        # extracted_links = set(extracted_links)
-        # for i in already_visted:
-        #     if i in extracted_links:
-        #         extracted_links.remove(i)
-        # for l in extracted_links:
-        #     print("****", l)
-        # already_visted.union(set(extracted_links))
-        # extracted_links = list(extracted_links)
+    already_visted
+    extracted_links = set(extracted_links)
+    for i in already_visted:
+        if i in extracted_links:
+            extracted_links.remove(i)
+    # for l in extracted_links:
+    #     print("****", l)
+    already_visted.union(set(extracted_links))
+    extracted_links = list(extracted_links)
         
-        return extracted_links
+    return extracted_links
 
 def is_valid(url):
     try:
