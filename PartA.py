@@ -47,17 +47,13 @@ runtime complexity is O(n^3)*O(n*log(n)) because a list comprehension to remove 
 removed from re.findall
 '''
 def tokenizer(fileName: str) -> list:
-    try:
-        t = []
-        with open(fileName, encoding="utf-8") as open_file:
-            for line in open_file: #O(n)
-                x = re.findall(r"\w+['\w+]", line) #O(n*log(n))
-                x = stripUnderscores(x) #O(n^2)
-                t += x #O(1)
+    for line in fileName: #O(n)
+        x = re.findall(r"\w+['\w+]", line) #O(n*log(n))
+        x = stripUnderscores(x) #O(n^2)
+        t += x #O(1)
 
-        return t
-    except:
-        print("Error in Tokenizer! File does not exist!")  
+    return t
+    
 
 '''
 runtime complexity is O(n^2) because the dictionary makes all keys lowercase in order to 

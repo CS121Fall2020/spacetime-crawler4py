@@ -11,12 +11,14 @@ from urllib.parse import urlparse
 from bs4 import BeautifulSoup
 from PartA import *
 from PartB import *
+import sys
 
 #def allTags(url):
 #tags_html = BeautifulSoup(html_url,"html.parser")
 #tags = [tag.name for tag in tags_html.find_all()]
 #global var holds urls we've been too
 already_visted = set()
+word_frequency_dict = dict()
 
 
 '''
@@ -46,11 +48,13 @@ def checkDomain(extracted_links):
 
 def url_texts(url,resp):
     stringy = ""
-    data = resp.raw_response.content
-    soup = BeautifulSoup(data, 'lxml')
-    stringy = soup.find('p').text
-    print("@@@@@@@@@I am stringy" , stringy)
-
+    try:
+        data = resp.raw_response.content
+        soup = BeautifulSoup(data, 'lxml')
+        stringy = soup.get_text()
+        print("@@@@@@@@@I am stringy" , stringy)
+    except:
+        print("This also didn't work")
     return stringy
 
 '''
@@ -65,29 +69,51 @@ we created a global set for all sites added to the extracted links
 Purpose: to get all info from a url possible
 '''
 def scraper(url, resp):    
-    #adds url to a list of urls that have been visited
-    #global already_visted
-    print('we are in scraper')
+    try:
+        #adds url to a list of urls that have been visited
+        #global already_visted
+        print('we are in scraper')
+        print('this is the type', resp.status)
+        if(resp.status == 200 or resp.status == 601):
+                
+        #print(resp.error)
+        #200 or 202
+            print('checking content')
+            soup = BeautifulSoup(resp.raw_response.content,'lxml')
+            size_url_text = sys.getsizeof(soup.get_text())
+            if(size_url_text <= 20000):
+                print("SIZE OF THE TEXT AREA STUFF WITH THE PLACE AND WHAT NOT",size_url_text)
+                #print(soup.get_text())
+                url_text = soup.get_text()
+                tokens = tokenizer(url_text)
+                word_frequency = computeWordFrequencies(tokens)
 
-    #something regarding valid HTTP response code
-    #its contents
-    #its sizeof()
-    #see how many pages it has
-    #get word count for each page
-    # put all words together
-    # extract next links
-    
-    already_visted.add(url)
-    
-    links = extract_next_links(url, resp)
-    if not links:
+                print('done checking')
+        #call part A on the soup.get_text
+        #something regarding valid HTTP response code
+        #its contents
+        #its sizeof()
+        #see how many pages it has
+        #get word count for each page
+        # put all words together
+        # extract next links
+        
+            url_texts(url, resp)
+            already_visted.add(url)
+            
+            links = extract_next_links(url, resp)
+            if not links:
+                return []
+            #returning the valid links
+            valid_links = checkDomain(links)
+            for l in valid_links:
+                print("^^^^^^^^", l)
+
+            return [link for link in valid_links if is_valid(link)]
         return []
-    #returning the valid links
-    valid_links = checkDomain(links)
-    for l in valid_links:
-        print("^^^^^^^^", l)
+    except:
 
-    return [link for link in valid_links if is_valid(link)]
+        return []
 
 
 '''
