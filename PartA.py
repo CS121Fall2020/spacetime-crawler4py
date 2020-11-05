@@ -47,13 +47,13 @@ runtime complexity is O(n^3)*O(n*log(n)) because a list comprehension to remove 
 removed from re.findall
 '''
 def tokenizer(fileName: str) -> list:
-    for line in fileName: #O(n)
-        x = re.findall(r"\w+['\w+]", line) #O(n*log(n))
+    try:
+        fileName = fileName.encode(encoding = 'utf-8',errors ='ignore')
+        x = re.findall(r"\w+['\w+]", fileName) #O(n*log(n))
         x = stripUnderscores(x) #O(n^2)
-        t += x #O(1)
-
-    return t
-    
+        return x
+    except:
+        return []
 
 '''
 runtime complexity is O(n^2) because the dictionary makes all keys lowercase in order to 
@@ -63,6 +63,8 @@ Each word is put into lowercase and added to the defaultdict which increments us
 '''
 def computeWordFrequencies(tokenList: list) -> defaultdict:
     wordDict = defaultdict(int) # O(1)
+    if(len(tokenList) == 0):
+        return wordDict
     for i in tokenList: # O(n)
         wordDict[i.lower()] += 1 # O(1) + O(N)
     return wordDict # O(1)
@@ -104,21 +106,21 @@ def topFifty(Frequencies:defaultdict):
 
 #writes to separate file so you can examine them
 def printFifty(Frequencies:defaultdict):
-    file = open("outputA.txt","w")
+    file = open("outputA.txt","w+")
     sorted_dict = sorted(Frequencies.items(),key = lambda x : x[1], reverse = True)
     for t in sorted_dict: # O(n)
         s  = str(t[0]) + " -> " + str(t[1]) + '\n'
         file.write(s) # O(1) + O(1) + O(1) + O(1) = O(1)
     file.close()
 
-if __name__ == '__main__':
+# if __name__ == '__main__':
     # string2 = '<p>Contents :</p><a href="https://uci.w3resource.com">Python Examples</a><a href="http://github.com">Even More Examples</a></script>\n    <script src="bin/js/btt.js" type="text/javascript">\n    </script>\n    <script src="bin/js/menu_hover.js" type="text/javascript">\n    </script>\n    <!-- Accessibilty - START -->\n    <script type="text/javascript">\n    var _userway_config = {\n        /* uncomment the following line to override default position*/\n        /* position: \'2\', */\n        /* uncomment the following line to override default size (values: small, large)*/\n        /* size: \'small\', */\n        /* uncomment the following line to override default language (e.g., fr, de, es, he, nl, etc.)*/\n        /* language: \'en-US\', */\n        /* uncomment the following line to override color set via widget (e.g., #053f67)*/\n        /* color: \'#0064a4\', */\n        /* uncomment the following line to override type set via widget(1=person, 2=chair, 3=eye)*/\n        /* type: \'1\', */\n        /* uncomment the following line to override support on mobile devices*/\n        /* mobile: true, */\n        account: \'GTYOD4aROB\'\n    };\n    </script>\n    <script src="https://cdn.userway.org/widget.js" type="text/javascript">\n    </script>\n    <!-- Accessibilty - END -->\n</body>\n\n</html>'
     # tokens = tokenizer(string2)
-    tokens = tokenizer("chonker.txt")
-    dic = computeWordFrequencies(tokens)
-    removeStopWords(dic)
-    newFrequencies = topFifty(dic)
-    printFifty(newFrequencies)
+    # tokens = tokenizer("chonker.txt")
+    # dic = computeWordFrequencies(tokens)
+    # removeStopWords(dic)
+    # newFrequencies = topFifty(dic)
+    # printFifty(newFrequencies)
     
 
 
