@@ -53,13 +53,18 @@ def scraper_text(url,resp):
             if(resp.raw_response.headers.get("content-type") == None or 'application' in resp.raw_response.headers.get("content-type")):
                 return defaultdict(int)
             if((resp.status >= 200 and resp.status < 400) or (resp.status == 601)):
-                print('checking text content')
                 soup = BeautifulSoup(resp.raw_response.content,'lxml')
-                url_text = soup.get_text()
-                tokens = tokenizer(url_text)
-                page_word_frequency_dict = defaultdict(int)
-                page_word_frequency_dict = computeWordFrequencies(tokens)
-                return page_word_frequency_dict
+                size_url_text = sys.getsizeof(soup.get_text())
+                if((size_url_text <= 100) or (size_url_text > 20000)):
+                    page_word_frequency_dict = defaultdict(int)
+                else:
+                    print('checking text content')
+                    soup = BeautifulSoup(resp.raw_response.content,'lxml')
+                    url_text = soup.get_text()
+                    tokens = tokenizer(url_text)
+                    page_word_frequency_dict = defaultdict(int)
+                    page_word_frequency_dict = computeWordFrequencies(tokens)
+                    return page_word_frequency_dict
             return defaultdict(int)
     except AttributeError:
         return defaultdict(int)
