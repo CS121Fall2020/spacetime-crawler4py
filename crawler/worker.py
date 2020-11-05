@@ -20,14 +20,18 @@ class Worker(Thread):
             if not tbd_url:
                 #print("nothing                  *")
                 self.logger.info("Frontier is empty. Stopping Crawler.")
+                #this is where we print result of top 50 words
+                #this is where we write a file of all sub domains in each domain
                 break
             resp = download(tbd_url, self.config, self.logger)
             self.logger.info(
                 f"Downloaded {tbd_url}, status <{resp.status}>, "
                 f"using cache {self.config.cache_server}.")
             #print("herrrrrrooooooo                  *")
-            scraped_urls = scraper(tbd_url, resp)
+            scraped_urls = scraper(tbd_url, resp) # -- This gets the the url Links
+            #scraper_text = scraper_text(tbd_url,resp) -- This gets the text for that page
             #print("herrrrrrooooooo                  *")
+            #this is where we add to our already visited set to stop repeats with 
             for scraped_url in scraped_urls:
                 self.frontier.add_url(scraped_url)
             self.frontier.mark_url_complete(tbd_url)

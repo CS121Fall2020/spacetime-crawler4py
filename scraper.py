@@ -17,10 +17,6 @@ from collections import defaultdict
 #tags_html = BeautifulSoup(html_url,"html.parser")
 #tags = [tag.name for tag in tags_html.find_all()]
 #global var holds urls we've been too
-already_visted = set()
-total_word_frequency_dict = defaultdict(int)
-page_wordcount_dict = dict()
-
 '''
 checks to make sure we are only adding domains to extracted links
 if they are relvant to any of these sub domains 
@@ -29,17 +25,14 @@ def checkDomain(extracted_links):
     valid_links = []
     for link in range(0,len(extracted_links)):
         if extracted_links[link]:
-            
             if ('http' not in extracted_links[link]):
                 extracted_links[link] = extracted_links[link][2:]
             if("#" in extracted_links[link]):
                 removeThisend = extracted_links[link].find("#")
                 extracted_links[link] = extracted_links[link][:removeThisend]
+
     for link in extracted_links:
         if link:
-            # if link[0:4] != 'http':
-            #     link = link[2:]
-            #     print("!!!!!!!!!!! I made it here", link)
             if '.ics.uci.edu' in link:
                 valid_links.append(link)
             elif '.cs.uci.edu' in link:
@@ -52,9 +45,27 @@ def checkDomain(extracted_links):
                 valid_links.append(link)
     
     return valid_links
-    
 
-'''
+def scraper_text(url,resp):
+    try:
+            #application/pdf
+            print('this is the type', resp.status)
+            print(resp.raw_response.headers.get("content-type"))
+            if('application' in resp.raw_response.headers.get("content-type")):
+                return defaultdict(int)
+            if((resp.status >= 200 and resp.status < 400) or (resp.status == 601)):
+                print('checking text content')
+                soup = BeautifulSoup(resp.raw_response.content,'lxml')
+                url_text = soup.get_text()
+                tokens = tokenizer(url_text)
+                page_word_frequency_dict = defaultdict(int)
+                page_word_frequency_dict = computeWordFrequencies(tokens)
+                return page_word_frequency_dict
+            return defaultdict(int)
+    except AttributeError:
+        return defaultint(int)
+
+''' 
 F(x) call(s):
     - extract_next_link
     - checkSubDomain
@@ -65,6 +76,7 @@ we created a global set for all sites added to the extracted links
 
 Purpose: to get all info from a url possible
 '''
+#scraper_url
 #You can check resp.raw_response.headers.get("content-type") to filter out pdf
 def scraper(url, resp):    
     try:
@@ -72,46 +84,26 @@ def scraper(url, resp):
         #adds url to a list of urls that have been visited
         #global already_visted
         print('this is the type', resp.status)
-        print(type(resp.raw_response.headers.get("content-type")))
-        if((resp.status >= 200 and resp.status < 400) or (resp.status == 601)):
-            if('application' in resp.raw_response.headers.get("content-type")):
+        print(resp.raw_response.headers.get("content-type"))
+        if('application' in resp.raw_response.headers.get("content-type")):
                 return []
-            print('checking content')
-            soup = BeautifulSoup(resp.raw_response.content,'lxml')
-            size_url_text = sys.getsizeof(soup.get_text())
-            page_word_frequency_dict = None
-            if(size_url_text <= 50000):
-                print("SIZE OF THE TEXT AREA STUFF WITH THE PLACE AND WHAT NOT",size_url_text)
-                url_text = soup.get_text()
-                tokens = tokenizer(url_text)
-                page_word_frequency_dict = computeWordFrequencies(tokens)
-                global total_word_frequency_dict
-                total_word_frequency_dict.update(page_word_frequency_dict)
-                word_count = 0
-                if(len(page_word_frequency_dict) == 0):
-                    word_count = sum(page_word_frequency_dict.values())
-                if url not in page_wordcount_dict:
-                    page_wordcount_dict[url] = word_count
-                else:
-                    print("something wents wrong, duplicates added when shouldn't")
-                # put all words together
-                # extract next links
-                already_visted.add(url)
-                links = extract_next_links(url, resp)
-                if not links:
-                    return []
-                #returning the valid links
-                valid_links = checkDomain(links)
-                for l in valid_links:
-                    print("^^^^^^^^", l)
-            
-                if page_word_frequency_dict:
-                    print('printing page_word_freq contents')
-                    printFifty(page_word_frequency_dict)
-                if total_word_frequency_dict:
-                    print('printing word_count_freq contents')
-                    printFifty(total_word_frequency_dict)
-                return [link for link in valid_links if is_valid(link)]
+        if((resp.status >= 200 and resp.status < 400) or (resp.status == 601)):
+            print('checking link content')
+            already_visted.add(url)
+            links = extract_next_links(url, resp)
+            if not links:
+                return []
+            #returning the valid links
+            valid_links = checkDomain(links)
+            for l in valid_links:
+                print("^^^^^^^^", l)
+            # if page_word_frequency_dict:
+            #     print('printing page_word_freq contents')
+            #     printFifty(page_word_frequency_dict)
+            # if total_word_frequency_dict:
+            #     print('printing word_count_freq contents')
+            #     printFifty(total_word_frequency_dict)
+            return [link for link in valid_links if is_valid(link)]
         return []
     except AttributeError:
 
@@ -127,9 +119,6 @@ Purpose: to get and return a list of the new links in the current url
 '''
 def extract_next_links(url, resp):
     # Implementation requred.
-    extracted_links = []
-    # ----------
-    try:
         data = resp.raw_response.content
         soup = BeautifulSoup(data, 'lxml')
         # Extracting all the <a> tags into a list.
