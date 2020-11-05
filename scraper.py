@@ -1,10 +1,10 @@
 '''
 [X]Honor the politeness delay for each site
-[]Crawl all pages with high textual information content
-[]Detect and avoid infinite traps
-[]Detect and avoid sets of similar pages with no information
-[]Detect and avoid dead URLs that return a 200 status but no data (click here to see what the different HTTP status codes mean (Links to an external site.))
-[]Detect and avoid crawling very large files, especially if they have low information value
+[X]Crawl all pages with high textual information content
+[X]Detect and avoid infinite traps
+[-]Detect and avoid sets of similar pages with no information
+[X]Detect and avoid dead URLs that return a 200 status but no data (click here to see what the different HTTP status codes mean (Links to an external site.))
+[X]Detect and avoid crawling very large files, especially if they have low information value
 '''
 import re
 from urllib.parse import urlparse
@@ -50,8 +50,7 @@ def scraper_text(url,resp):
     try:
             #application/pdf
             print('this is the type', resp.status)
-            print(resp.raw_response.headers.get("content-type"))
-            if('application' in resp.raw_response.headers.get("content-type")):
+            if(resp.raw_response.headers.get("content-type") == None or 'application' in resp.raw_response.headers.get("content-type")):
                 return defaultdict(int)
             if((resp.status >= 200 and resp.status < 400) or (resp.status == 601)):
                 print('checking text content')
@@ -63,7 +62,7 @@ def scraper_text(url,resp):
                 return page_word_frequency_dict
             return defaultdict(int)
     except AttributeError:
-        return defaultint(int)
+        return defaultdict(int)
 
 ''' 
 F(x) call(s):
@@ -83,26 +82,23 @@ def scraper(url, resp):
         #application/pdf
         #adds url to a list of urls that have been visited
         #global already_visted
+        print("***********************************")
+        print("WEBSITE SCRAPING THROUGH",str(url))
         print('this is the type', resp.status)
-        print(resp.raw_response.headers.get("content-type"))
-        if('application' in resp.raw_response.headers.get("content-type")):
+        print("***********************************")
+        if(resp.raw_response.headers.get("content-type") == None or 'application' in resp.raw_response.headers.get("content-type")):
                 return []
         if((resp.status >= 200 and resp.status < 400) or (resp.status == 601)):
             print('checking link content')
-            already_visted.add(url)
             links = extract_next_links(url, resp)
             if not links:
                 return []
             #returning the valid links
             valid_links = checkDomain(links)
-            for l in valid_links:
-                print("^^^^^^^^", l)
-            # if page_word_frequency_dict:
-            #     print('printing page_word_freq contents')
-            #     printFifty(page_word_frequency_dict)
-            # if total_word_frequency_dict:
-            #     print('printing word_count_freq contents')
-            #     printFifty(total_word_frequency_dict)
+            valid_links_set = set(valid_links)
+            valid_links = list(valid_links_set)
+            # for l in valid_links:
+            #     print("^^^^^^^^", l)
             return [link for link in valid_links if is_valid(link)]
         return []
     except AttributeError:
@@ -118,7 +114,9 @@ extracted links.
 Purpose: to get and return a list of the new links in the current url
 '''
 def extract_next_links(url, resp):
-    # Implementation requred.
+    extracted_links = []
+    try:
+        # Implementation requred.
         data = resp.raw_response.content
         soup = BeautifulSoup(data, 'lxml')
         # Extracting all the <a> tags into a list.
@@ -129,13 +127,8 @@ def extract_next_links(url, resp):
             # print('in for') 
             extracted_links.append(tag.get('href'))
             # print(tag.get('href'))
-        extracted_links = is_valid(extracted_links)
-        extracted_links = set(extracted_links)
-        for i in already_visted:
-            if i in extracted_links:
-                extracted_links.remove(i)
-        already_visted.union(set(extracted_links))
-        extracted_links = list(extracted_links)
+        extracted_links = checkDomain(extracted_links)
+        return extracted_links
     
     except:
         print("It didn't work")
@@ -157,7 +150,7 @@ def is_valid(url):
             return False
         return not re.match(
             r".*\.(css|js|bmp|gif|jpeg|jpg|ico"
-            + r"|png|tiff?|mid|mp2|mp3|mp4"
+            + r"|png|r|tiff?|mid|mp2|mp3|mp4"
             + r"|wav|avi|mov|mpeg|ram|m4v|mkv|ogg|ogv|pdf"
             + r"|ps|eps|tex|ppt|pptx|doc|docx|xls|xlsx|names"
             + r"|data|dat|exe|bz2|tar|msi|bin|7z|psd|dmg|iso"

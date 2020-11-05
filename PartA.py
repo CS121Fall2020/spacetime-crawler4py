@@ -35,7 +35,7 @@ runtime complexity O(n^2)
 removes non alphanumeric chars from each token if they arent already removed
 '''
 def stripUnderscores(text: list):
-    return [i.strip('_][{}^!@#$.%&*()</\\|=+>?`~/*') for i in text]
+    return [i.strip('_][{}^!@#$.%&*()</\\|=+>?`~/*0123456789') for i in text]
 
 
 '''
@@ -48,11 +48,11 @@ removed from re.findall
 '''
 def tokenizer(fileName: str) -> list:
     try:
-        fileName = fileName.encode(encoding = 'utf-8',errors ='ignore')
         x = re.findall(r"\w+['\w+]", fileName) #O(n*log(n))
         x = stripUnderscores(x) #O(n^2)
         return x
     except:
+        print('invalid')
         return []
 
 '''
@@ -66,7 +66,8 @@ def computeWordFrequencies(tokenList: list) -> defaultdict:
     if(len(tokenList) == 0):
         return wordDict
     for i in tokenList: # O(n)
-        wordDict[i.lower()] += 1 # O(1) + O(N)
+        if i != '':
+            wordDict[i.lower()] += 1 # O(1) + O(N)
     return wordDict # O(1)
 
 '''
@@ -106,7 +107,7 @@ def topFifty(Frequencies:defaultdict):
 
 #writes to separate file so you can examine them
 def printFifty(Frequencies:defaultdict):
-    file = open("outputA.txt","w+")
+    file = open("top50words.txt","w")
     sorted_dict = sorted(Frequencies.items(),key = lambda x : x[1], reverse = True)
     for t in sorted_dict: # O(n)
         s  = str(t[0]) + " -> " + str(t[1]) + '\n'
