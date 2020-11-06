@@ -32,7 +32,6 @@ class Worker(Thread):
             #     Largestpage.write(l)
             #     Largestpage.close()
             #     break
-
             removeStopWords(self.test_dic)
             printFifty(topFifty(self.test_dic))
             Uniquepages = open("numUniquePages.txt",'w')
@@ -64,9 +63,15 @@ class Worker(Thread):
             self.logger.info(
                 f"Downloaded {tbd_url}, status <{resp.status}>, "
                 f"using cache {self.config.cache_server}.")
-            #print("herrrrrrooooooo                  *")
             scraped_urls = scraper(tbd_url, resp) # -- This gets the the url Links
             scraped_text = scraper_text(tbd_url,resp)
+            if (type(scraped_urls) == type(None)):
+                scraped_urls = []
+            if (type(scraped_text) == type(None)):
+                scraped_text = defaultdict(int)
+            if(len(scraped_text) < 100):
+              scraped_text = defaultdict(int)
+              scraped_urls = []
             self.url_dicts[str(tbd_url)] = scraped_text
             self.allWords(scraped_text)
             print('len(URLS)')
@@ -90,8 +95,6 @@ class Worker(Thread):
             print('len(ALL URLS)')
             print('========================================================')
             print(len(self.set_of_links))
-            #print("herrrrrrooooooo                  *")
-            #this is where we add to our already visited set to stop repeats with 
             for scraped_url in scraped_urls:
                 self.frontier.add_url(scraped_url)
             self.frontier.mark_url_complete(tbd_url)
@@ -99,9 +102,10 @@ class Worker(Thread):
 
         
     def allWords(self,page_dict):
-        print('inside allwords')
-        for k,v in page_dict.items():
-            self.test_dic[k] += v
+        if(len(page_dict) != 0):
+            # print('inside allwords')
+            for k,v in page_dict.items():
+                self.test_dic[k] += v
 
      
 

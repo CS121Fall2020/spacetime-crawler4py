@@ -6,7 +6,6 @@ import sys
 import re
 from collections import defaultdict
 
-#All the stop words... painfully hardcoded :')
 stop_words = [
     "a","about","above","after","again","against","all","am","an",
     "and","any","are","aren't","as","at","be","because","been","before",
@@ -30,8 +29,6 @@ stop_words = [
     "you've","your","yours","yourself","yourselves"
 ]
 '''
-runtime complexity O(n^2)
-
 removes non alphanumeric chars from each token if they arent already removed
 '''
 def stripUnderscores(text: list):
@@ -42,9 +39,6 @@ def stripUnderscores(text: list):
 a file is opened and each line is searched for all possible alphanumeric matches
 After, is sent through another function that iterates through each token in the line removing 
 non alphanumeric characters that got through the regular expression
-
-runtime complexity is O(n^3)*O(n*log(n)) because a list comprehension to remove all characters not 
-removed from re.findall
 '''
 def tokenizer(fileName: str) -> list:
     try:
@@ -56,9 +50,6 @@ def tokenizer(fileName: str) -> list:
         return []
 
 '''
-runtime complexity is O(n^2) because the dictionary makes all keys lowercase in order to 
-make sure each key is can be the same case
-
 Each word is put into lowercase and added to the defaultdict which increments using int class
 '''
 def computeWordFrequencies(tokenList: list) -> defaultdict:
@@ -71,12 +62,8 @@ def computeWordFrequencies(tokenList: list) -> defaultdict:
     return wordDict # O(1)
 
 '''
-The run time complexity is O(n*log(n)) because I have to sort the dictionary into a list of tuples
-in order to print the frequencies out in order
-
 Each key and value is turned into a tuple in order from greatest value to lowest value of the tuples
 and going from a to z for keys (with exception to numbers based on ascii values)
-
 '''
 def printFrequencies(Frequencies: defaultdict):
     sorted_dict = sorted(Frequencies.items(),key = lambda x : x[1], reverse = True) # O(n*log(n))
@@ -123,37 +110,3 @@ def printFifty(Frequencies:defaultdict):
     # newFrequencies = topFifty(dic)
     # printFifty(newFrequencies)
     
-
-
-
-      
-
-#returns updated l
-# def getLinks(copy_line:str,links:list) -> list:
-#     if (copy_line == ''):
-#         return links
-#     while("\'http" in copy_line or "\"http" in copy_line):
-#         if("\'http" in copy_line):
-#             link_index = copy_line.find("\'http")
-#         elif("\"http" in copy_line):
-#             link_index = copy_line.find("\"http")
-#         sub_while = link_index
-#         while (link_index < len(copy_line)):
-#             if copy_line[i] == "\"" or copy_line[i] == "\'":
-#                     links.append(line[link_index + 1 : i])
-#                     copy_line = copy_line[i::]
-
-# <![CDATA[\n!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=\'https://weatherwidget.io/js/widget.min.js\';fjs.parentNode.insertBefore(js,fjs);}}(document,\'script\',\'weatherwidget-io-js\');\n// ]]></script>\n END/weather widget -->
-# def tokenizer(fileName: str) -> list:
-#     links = list()
-#     lines = fileName.split('\n')
-#     for line in lines:
-#         print(links)
-#         urls = re.findall('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', line)
-#         links += urls
-
-#             #send to another function to get link
-            
-#     # for l in links:
-#     #     print(l)
-#     # return links

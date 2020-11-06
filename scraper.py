@@ -48,24 +48,24 @@ def checkDomain(extracted_links):
 
 def scraper_text(url,resp):
     try:
-            #application/pdf
-            print('this is the type', resp.status)
-            if(resp.raw_response.headers.get("content-type") == None or 'application' in resp.raw_response.headers.get("content-type")):
-                return defaultdict(int)
-            if((resp.status >= 200 and resp.status < 400) or (resp.status == 601)):
-                soup = BeautifulSoup(resp.raw_response.content,'lxml')
-                size_url_text = sys.getsizeof(soup.get_text())
-                if((size_url_text <= 100) or (size_url_text > 20000)):
-                    page_word_frequency_dict = defaultdict(int)
-                else:
-                    print('checking text content')
-                    soup = BeautifulSoup(resp.raw_response.content,'lxml')
-                    url_text = soup.get_text()
-                    tokens = tokenizer(url_text)
-                    page_word_frequency_dict = defaultdict(int)
-                    page_word_frequency_dict = computeWordFrequencies(tokens)
-                    return page_word_frequency_dict
+        #application/pdf
+        page_word_frequency_dict = defaultdict(int)
+        print('this is the type', resp.status)
+        if(resp.raw_response.headers.get("content-type") == None or 'application' in resp.raw_response.headers.get("content-type")):
             return defaultdict(int)
+        if((resp.status >= 200 and resp.status < 400) or (resp.status == 601)):
+            soup = BeautifulSoup(resp.raw_response.content,'lxml')
+            size_url_text = sys.getsizeof(soup.get_text())
+            if((size_url_text < 250) or (size_url_text > 626897)):
+                page_word_frequency_dict = defaultdict(int)
+            else:
+                print('checking text content')
+                url_text = soup.get_text()
+                tokens = tokenizer(url_text)
+                page_word_frequency_dict = defaultdict(int)
+                page_word_frequency_dict = computeWordFrequencies(tokens)
+                return page_word_frequency_dict
+        return page_word_frequency_dict
     except AttributeError:
         return defaultdict(int)
 
@@ -102,8 +102,6 @@ def scraper(url, resp):
             valid_links = checkDomain(links)
             valid_links_set = set(valid_links)
             valid_links = list(valid_links_set)
-            # for l in valid_links:
-            #     print("^^^^^^^^", l)
             return [link for link in valid_links if is_valid(link)]
         return []
     except AttributeError:
@@ -143,10 +141,7 @@ def extract_next_links(url, resp):
 
 '''
 Purpose: checks to make sure the url is valid.
-    - valid sites are NOT special file types, such as: pdf,gif,png,mp4,etc.
-
-Proposals: REDACTED
-    
+    - valid sites are NOT special file types, such as: pdf,gif,png,mp4,etc.    
 '''
 def is_valid(url):
     try:
